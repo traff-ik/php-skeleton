@@ -1,9 +1,12 @@
 version: "3.8"
 
 x-app-volumes: &app-volumes
-  - ./src:/usr/app/src
-  - ./tests:/usr/app/tests
-  - app-vendor:/usr/app/vendor
+  volumes:
+    - ./src:/usr/app/src:delegated
+    - ./tests:/usr/app/tests:delegated
+    - ./composer.json:/usr/app/composer.json:delegated
+    - ./composer.lock:/usr/app/composer.lock:delegated
+    - app-vendor:/usr/app/vendor
 
 volumes:
   app-vendor:
@@ -14,6 +17,7 @@ networks:
 services:
   app:
     build:
+      context: .
       dockerfile: ./docker/php/Dockerfile
     networks:
       - app

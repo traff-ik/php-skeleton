@@ -29,9 +29,9 @@ RUN apt-get update && apt-get install -y \
     && cd icu/source \
     && ./configure --prefix="/opt/icu" && make && make install \
     && cd && rm -rf icu && rm -f icu.tar.gz \
-    && docker-php-ext-configure intl --with-icu-dir="/opt/icu" \
+    && LD_LIBRARY_PATH=/opt/icu/lib PKG_CONFIG_PATH=/opt/icu/lib/pkgconfig docker-php-ext-configure intl \
     && docker-php-ext-install intl \
-    && apt-get autoremove -y && apt-get remove --purge python3 -y && rm -rf /usr/lib/python3* && apt-get clean && rm -rf /var/lib/apt/lists/*
+    && apt-get remove --purge python3 -y && apt-get autoremove -y && rm -rf /usr/lib/python3* && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # PHP extensions
 
@@ -53,13 +53,14 @@ COPY ./docker/php/conf.d "$PHP_INI_DIR"/conf.d
 
 WORKDIR /usr/app
 
-RUN mkdir -p /usr/app/profiler
-
-COPY . .
-
 # Composer
 
-RUN composer check-platform-reqs && composer install --no-suggest --no-scripts
+COPY composer.json composer.lock ./
+RUN composer check-platform-reqs && composer install --no-suggest
+
+RUN mkdir -p ./profiler
+
+COPY . .
 
 EXPOSE 9060
 
