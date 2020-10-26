@@ -56,7 +56,7 @@ WORKDIR /usr/app
 # Composer
 
 COPY composer.json composer.lock ./
-RUN composer check-platform-reqs && composer install --no-suggest
+RUN composer check-platform-reqs && composer install
 
 RUN mkdir -p ./profiler
 
